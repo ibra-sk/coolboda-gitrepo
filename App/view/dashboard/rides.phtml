@@ -1,0 +1,133 @@
+<?php
+	$rides = $this->view_data['rides'];
+
+?>	
+	<main class="h-full overflow-y-auto">
+        <div class="container px-6 mx-auto grid">
+            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Ride Travel</h2>
+						
+			<!--
+			<div class="flex items-center mb-4">
+				<a href="track/dropmap" class="px-4 bg-blue p-3 rounded-lg text-white mr-2">Track Driver Map</a>
+			</div>
+			-->
+			
+			<!-- New Table -->
+			<div class="w-full overflow-hidden rounded-lg shadow-xs mb-8">
+				<div class="w-full overflow-x-auto">
+					<div class="max-w-screen-lg mx-auto w-full h-full flex flex-col items-center justify-center">
+						<div x-data="dataTable()"
+							x-init="
+							initData()
+							$watch('searchInput', value => {
+							  search(value)
+							})" class="p-5 w-full flex flex-col dark:text-gray-400 dark:bg-gray-800 dark:border-gray-700">
+							<div class="relative text-gray-500 focus-within:text-purple-600 dark:focus-within:text-purple-400">
+								<div class="p-4">
+									<input x-model="searchInput" type="text" class="block w-full pr-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" placeholder="Search by Name or Phone Number">
+								</div>
+							</div>
+							
+							<table class="w-full whitespace-no-wrap" id="dataTable">
+								<thead>
+									<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+										<th class="px-4 py-3">Reference</th>
+										<th class="px-4 py-3">Pick Up</th>
+										<th class="px-4 py-3">Drop Off</th>
+										<th class="px-4 py-3">Distance</th>
+										<th class="px-4 py-3">Fair Change</th>
+										<th class="px-4 py-3">Payment Method</th>
+										<th class="px-6 py-3">Start Time</th>
+										<th class="px-6 py-3">End Time</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+									<template x-for="(item, index) in items" :key="index">
+										<tr x-show="checkView(index + 1)" class="text-sm text-gray-700 dark:text-white">
+											<td class="px-4 py-3">
+												<a x-bind:href="`<?=DOMAIN?>dashboard/rides/view?rid=${item.reference}`">
+													<p class="font-semibold" x-text="item.reference"></p>
+												</a>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.pickup"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.dropoff"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.distance"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.amount"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.payment"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<span x-text="item.timestamp"></span>
+											</td>
+											<td class="px-4 py-3">
+												<span x-text="item.endtime"></span>
+											</td>
+										</tr>
+									</template>
+									<tr x-show="isEmpty()">
+										<td colspan="9" class="text-center py-3 text-gray-900 text-sm">No matching records found.</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+								<span class="flex items-center col-span-3"></span>
+								<span class="col-span-2"></span>
+								<!-- Pagination -->
+								<span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+									<nav aria-label="Table navigation">
+										<ul class="inline-flex items-center">
+											<li>
+												<button class="px-3 py-1 mx-2 border rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple" aria-label="Previous" @click="changePage(currentPage - 1)">
+													NEXT
+												</button>
+											</li>
+											
+											<li>
+												<button class="px-3 py-1 mx-2 border rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple" aria-label="Next" @click="changePage(currentPage + 1)">
+													PREV
+												</button>
+											</li>
+										</ul>
+									</nav>
+								</span>
+							</div>
+						</div>
+					</div>		
+				</div>
+			</div>
+			
+			
+			
+		</div>
+    </main>
+	
+</div>
+</div>
+<?php
+$data = [];
+foreach($rides as $entry){
+	array_push($data, array('reference' => $entry['ride_token'],
+							'fullname' => $entry['user_id'],
+							'pickup' => $entry['start_address'],
+							'dropoff' => $entry['end_address'],
+							'distance' => $entry['route_direction'],
+							'amount' => $entry['amount'].' UGX',
+							'payment' => $entry['payment_method'],
+							'timestamp' => date('F d, Y h:i:s a', strtotime($entry['start_time'])),
+							'endtime' => date('F d, Y h:i:s a', strtotime($entry['end_time']))));
+}
+?>
+<script>
+let dati = <?=json_encode($data);?>;
+</script>	
+<!-- partial -->
+<script src='https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js'></script>
+<script  src="<?=DOMAIN?>assets/js/datatable.js"></script>

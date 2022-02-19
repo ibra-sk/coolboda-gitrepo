@@ -1,0 +1,126 @@
+	<main class="h-full overflow-y-auto">
+        <div class="container px-6 mx-auto grid">
+            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Create new Driver Account</h2>
+			 <?php
+				if(isset($_GET['alert'])){
+					$alert = $_GET['alert'];
+					if($alert == 'photo_fail'){
+						echo '<div class="py-3 px-5 mb-4 bg-red-100 text-red-900 text-sm rounded-md border border-red-200" role="alert">
+									<strong>Photo Image could not be saved, please try another Image</strong>
+								</div>';
+					}
+					if($alert == 'save_fail'){
+						echo '<div class="py-3 px-5 mb-4 bg-red-100 text-red-900 text-sm rounded-md border border-red-200" role="alert">
+									<strong>Failed to save Driver Info, please try again.</strong>
+								</div>';
+					}
+				}
+			?>
+			<form action="<?=DOMAIN?>dashboard/drivers/new" method="POST" enctype="multipart/form-data" class="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+				<label class="block text-sm">
+					<span class="text-gray-700 dark:text-gray-400">Firstname</span>
+					<input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" placeholder="Driver Firstname" name="firstname" required>
+				</label>
+				
+				<label class="mt-2 block text-sm">
+					<span class="text-gray-700 dark:text-gray-400">Lastname</span>
+					<input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" placeholder="Driver Lastname" name="lastname" required>
+				</label>
+				
+				<label class="mt-2 block text-sm">
+					<span class="text-gray-700 dark:text-gray-400">Phone Number</span>
+					<input type="number" minlength="12" maxlength="12" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" placeholder="Driver Phone Number for App" name="phone"  required>
+				</label>
+				
+				<label class="mt-2 block text-sm">
+					<span class="text-gray-700 dark:text-gray-400">Email</span>
+					<input type="email" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" placeholder="Driver Email for contact Info" name="email" required>
+				</label>
+
+				<div class="mt-4 text-sm">
+					<span class="text-gray-700 dark:text-gray-400">
+					  Gender
+					</span>
+					<div class="mt-2">
+						<label class="inline-flex items-center text-gray-600 dark:text-gray-400">
+							<input type="radio" class="text-purple-600 form-radio focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" name="gender" value="male" required>
+							<span class="ml-2">Male</span>
+						</label>
+						<label class="inline-flex items-center ml-6 text-gray-600 dark:text-gray-400">
+							<input type="radio" class="text-purple-600 form-radio focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" name="gender" value="female" required>
+							<span class="ml-2">Female</span>
+						</label>
+					</div>
+				</div>
+				
+				<label class="mt-4 block text-sm">
+					<span class="text-gray-700 dark:text-gray-400">Boda Number</span>
+					<input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" placeholder="Driver Boda or Helmet Number" name="boda" required>
+				</label>
+				
+				<div class="mt-4 grid grid-cols-1 space-y-2">
+					<label class="text-sm font-bold text-gray-500 tracking-wide">Attach Driver Face Picture</label>
+					<div class="flex items-center justify-center w-full" x-data="imageViewer()">
+						<label class="flex flex-col rounded-lg border-4 border-dashed w-full h-60 p-10 group text-center">
+							<!-- Show the image -->
+							<template x-if="imageUrl">
+								<div class="h-full w-full text-center flex flex-col items-center justify-center items-center  ">
+									<!---<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-blue-400 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+									</svg>-->
+									
+									<div class="flex flex-auto max-h-24 w-2/5 mx-auto -mt-10">
+										<img class="has-mask h-24 object-center" :src="imageUrl" alt="Driver Face Image">
+									</div>
+									<p class="pointer-none text-gray-500 "><span class="text-sm">Drag and drop</span> files here <br /> or <span class="text-blue-600 hover:underline">select a file</span> from your computer</p>
+								</div>
+							</template>
+							
+							<!-- Show the gray box when image is not available -->
+							<template x-if="!imageUrl">
+								<div class="h-full w-full text-center flex flex-col items-center justify-center items-center  ">
+									<!---<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-blue-400 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+									</svg>-->
+									
+									<div class="flex flex-auto max-h-48 w-2/5 mx-auto -mt-10">
+										<img class="has-mask h-36 object-center" src="https://img.freepik.com/free-vector/image-upload-concept-landing-page_52683-27130.jpg?size=338&ext=jpg" alt="freepik image">
+									</div>
+									<p class="pointer-none text-gray-500 "><span class="text-sm">Drag and drop</span> files here <br /> or <span class="text-blue-600 hover:underline">select a file</span> from your computer</p>
+								</div>
+							</template>
+							
+							<input type="file" name="driverimg" accept="image/png, image/jpeg" @change="fileChosen" class="hidden" required>
+						</label>
+					</div>
+				</div>
+				
+				<button type="submit" class="mt-6 px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple" value="submit">
+                  Create Now
+                </button>
+            </div>
+		</div>
+    </main>
+	
+</div>
+</div>
+<script>
+function imageViewer(src = ''){
+  return{
+    imageUrl: src,
+	fileChosen(event) {
+      this.fileToDataUrl(event, src => this.imageUrl = src)
+    },
+
+    fileToDataUrl(event, callback) {
+      if (! event.target.files.length) return
+
+      let file = event.target.files[0],
+          reader = new FileReader()
+
+      reader.readAsDataURL(file)
+      reader.onload = e => callback(e.target.result)
+    },
+  }
+}
+</script>

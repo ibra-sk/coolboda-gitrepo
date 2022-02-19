@@ -1,0 +1,201 @@
+<?php
+	$tx = $this->view_data['tx'];
+	$sum_tx = $this->view_data['sumTx'];
+	$num_tx = $this->view_data['numTx'];
+	
+	$thisDate = isset($_GET['dated']) ? $_GET['dated']: date("Y-m-d");
+	$nameDate = date('d F Y',  strtotime($thisDate));
+?>
+<link rel="stylesheet" href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css">
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
+<style>
+    [x-cloak] {
+      display: none;
+    }
+</style>
+  
+	<main class="h-full overflow-y-auto">
+        <div class="container px-6 mx-auto grid">
+			<div class="flex flex-row justify-items-end">
+				<div class="flex-grow w-full">
+					<h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Payment Analytics | <small class="text-sm"><?=$nameDate?></small></h2>
+				</div>
+				<div class="flex items-end mb-4 ">
+					<button id="SearchBtn" class="px-4 bg-blue p-3 rounded-lg text-white mr-2" onclick="fetchNewDateTime()">Search</button>
+				</div>
+				<div class="flex items-end mb-4">
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+						</div>
+						<input datepicker datepicker-orientation="bottom right" datepicker-autohide datepicker-buttons datepicker-format="yyyy-mm-dd" type="text" id="dateQtime" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-4 pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date" onchange="fetchNewDateTime()" value="<?=$thisDate?>">
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
+				<!-- Card -->
+				<div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+					<div class="p-3 mr-4 text-teal-500 bg-teal-100 rounded-full dark:text-teal-100 dark:bg-teal-500">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+						</svg>
+					</div>
+					<div>
+					  <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+						Total Payment Amount
+					  </p>
+					  <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+						<?=number_format($sum_tx)?> UGX
+					  </p>
+					</div>
+				</div>
+				
+				<!-- Card -->
+				<div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+					<div class="p-3 mr-4 text-teal-500 bg-teal-100 rounded-full dark:text-teal-100 dark:bg-teal-500">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+						</svg>
+					</div>
+					<div>
+					  <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+						Total Number of Transaction
+					  </p>
+					  <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+						<?=number_format($num_tx)?>
+					  </p>
+					</div>
+				</div>
+            </div>
+				
+			
+			<!-- New Table -->
+			<div class="w-full overflow-hidden rounded-lg shadow-xs mb-8">
+				<div class="w-full overflow-x-auto">
+					<div class="max-w-screen-lg mx-auto w-full h-full flex flex-col items-center justify-center">
+						<div x-data="dataTable()"
+							x-init="
+							initData()
+							$watch('searchInput', value => {
+							  search(value)
+							})" class="p-5 w-full flex flex-col dark:text-gray-400 dark:bg-gray-800 dark:border-gray-700">
+							<div class="relative text-gray-500 focus-within:text-purple-600 dark:focus-within:text-purple-400">
+								<div class="p-4">
+									<input x-model="searchInput" type="text" class="block w-full pr-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" placeholder="Search by Name or Phone Number">
+								</div>
+							</div>
+							
+							<table class="w-full whitespace-no-wrap" id="dataTable">
+								<thead>
+									<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+										<th class="px-4 py-3">Reference</th>
+										<th class="px-4 py-3">Sender</th>
+										<th class="px-4 py-3">Receiver</th>
+										<th class="px-4 py-3">Amount</th>
+										<th class="px-4 py-3">Type</th>
+										<th class="px-4 py-3">Status</th>
+										<th class="px-6 py-3">Timestamp</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+									<template x-for="(item, index) in items" :key="index">
+										<tr x-show="checkView(index + 1)" class="text-sm text-gray-700 dark:text-white">
+											<td class="px-4 py-3">
+												<a x-bind:href="`<?=DOMAIN?>dashboard/payment/view?pid=${item.reference}`">
+													<p class="font-semibold" x-text="item.reference"></p>
+												</a>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.fullname"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.receiver"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.amount"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.type"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.status"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<span x-text="item.timestamp"></span>
+											</td>
+											
+										</tr>
+									</template>
+									<tr x-show="isEmpty()">
+										<td colspan="7" class="text-center py-3 text-gray-900 text-sm">No matching records found.</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+								<span class="flex items-center col-span-3"></span>
+								<span class="col-span-2"></span>
+								<!-- Pagination -->
+								<span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+									<nav aria-label="Table navigation">
+										<ul class="inline-flex items-center">
+											<li>
+												<button class="px-3 py-1 mx-2 border rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple" aria-label="Previous" @click="changePage(currentPage - 1)">
+													NEXT
+												</button>
+											</li>
+											
+											<li>
+												<button class="px-3 py-1 mx-2 border rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple" aria-label="Next" @click="changePage(currentPage + 1)">
+													PREV
+												</button>
+											</li>
+										</ul>
+									</nav>
+								</span>
+							</div>
+						</div>
+					</div>		
+				</div>
+			</div>
+			
+			
+			
+		</div>
+    </main>
+	
+</div>
+</div>
+<script src="https://unpkg.com/@themesberg/flowbite@1.2.0/dist/datepicker.bundle.js"></script>
+<script>
+function fetchNewDateTime(){
+	
+	let dateTime = document.querySelector('#dateQtime');
+	let selectDate = dateTime.value;
+	if(selectDate == ''){
+		alert('Choose Date to search first');
+	}else{
+		window.location.href = "review?dated="+selectDate;
+	}
+	
+}
+</script>
+<?php
+$data = [];
+foreach($tx as $entry){
+	array_push($data, array('fullname' => $entry['sender_id'],
+							'reference' => $entry['txref'],
+							'receiver' => $entry['receiver_id'],
+							'amount' => number_format($entry['amount']).' UGX',
+							'type' => strtoupper($entry['tx_type']),
+							'status' => strtoupper($entry['status']),
+							'timestamp' => date('h:i:s a', strtotime($entry['timestamp']))));
+}
+?>
+<script>
+let dati = <?=json_encode($data);?>;
+</script>	
+<!-- partial -->
+<script src='https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js'></script>
+<script  src="<?=DOMAIN?>assets/js/datatable.js"></script>

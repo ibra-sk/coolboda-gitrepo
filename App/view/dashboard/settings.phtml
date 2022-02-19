@@ -1,0 +1,68 @@
+<?php
+	$account = $this->view_data['account'];
+?>	
+	<main class="h-full overflow-y-auto" x-data="{ 'showModal': false }" @keydown.escape="{showModal = false}" x-cloak>
+        <div class="container px-6 mx-auto grid">
+			<div class="flex items-stretch justify-items-stretch my-6 ">
+				<h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 w-1/2">Account Settings</h2>
+				<span class="px-4 py-1 uppercase font-semibold rounded-full <?=$color?>"><?=$account['status']?></span>
+			</div>
+			
+			<!--Overlay TopUp-->
+			<div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showModal" :class="{ 'absolute inset-0 z-10 flex items-center justify-center': showModal }">
+				<!--Dialog-->
+				<div class="bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="showModal" @click.away="showModal = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="hidden" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="hidden">
+
+					<!--Title-->
+					<div class="flex justify-between items-center pb-3">
+						<p class="text-2xl font-bold">Top Up Payment</p>
+						<div class="cursor-pointer z-50" @click="showModal = false">
+							<svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+								<path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+							</svg>
+						</div>
+					</div>
+
+					<!-- content -->
+					<p>Enter your Phone Number and Amount to send.</p>
+					<input class="block w-full pr-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input mt-4" type="number" placeholder="Phone Number" value="256789140565" id="tpPhone" disabled required>
+					<input class="block w-full pr-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input mb-4" type="number" placeholder="Enter amount to send" id="tpAmount" required>
+					
+
+					<!--Footer-->
+					<div class="flex justify-end pt-2">
+						<button class="px-4 bg-blue-300 p-3 rounded-lg text-indigo-500 hover:bg-blue-100 hover:text-indigo-400 mr-2" @click="">Send</button>
+						<button class="modal-close px-4 bg-red-600 p-3 rounded-lg text-white hover:bg-red-400" @click="showModal = false">Close</button>
+					</div>
+
+
+				</div>
+				<!-- End Dialog -->
+			</div>
+			<!-- End Overlay -->
+			<div class="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+				<label class="block mt-4 text-sm">
+					<span class="text-gray-700 dark:text-gray-400">Full Name</span>
+					<!-- focus-within sets the color for the icon when input is focused -->
+					<div class="relative text-gray-500 focus-within:text-purple-600 dark:focus-within:text-purple-400">
+						<input class="block w-full pr-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" placeholder="Firstname Lastname" value="<?=$account['display_name']?>" disabled>
+					</div>
+				</label>
+				<label class="block mt-4 mb-4 text-sm">
+					<span class="text-gray-700 dark:text-gray-400">
+						Email Address
+					</span>
+					<div class="relative text-gray-500 focus-within:text-purple-600">
+						<input class="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" placeholder="yourself@email.com" value="<?=$account['email']?>" disabled>
+						<button class="absolute inset-y-0 right-0 px-4 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+							Reset New Password
+						</button>
+					</div>
+				</label>
+            </div>
+		</div>
+		
+    </main>
+	
+</div>
+</div>

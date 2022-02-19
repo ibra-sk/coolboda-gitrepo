@@ -1,0 +1,122 @@
+<?php
+	$drivers = $this->view_data['drivers'];
+
+?>	
+	<main class="h-full overflow-y-auto">
+        <div class="container px-6 mx-auto grid">
+            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Boda Drivers</h2>
+			
+			<div class="flex items-center mb-4">
+				<a href="drivers/new" class="px-4 bg-blue p-3 rounded-lg text-white mr-2">Create New Account</a>
+			</div>
+			
+			
+			<!-- New Table -->
+			<div class="w-full overflow-hidden rounded-lg shadow-xs mb-8">
+				<div class="w-full overflow-x-auto">
+					<div class="max-w-screen-lg mx-auto w-full h-full flex flex-col items-center justify-center">
+						<div x-data="dataTable()"
+							x-init="
+							initData()
+							$watch('searchInput', value => {
+							  search(value)
+							})" class="p-5 w-full flex flex-col dark:text-gray-400 dark:bg-gray-800 dark:border-gray-700">
+							<div class="relative text-gray-500 focus-within:text-purple-600 dark:focus-within:text-purple-400">
+								<div class="p-4">
+									<input x-model="searchInput" type="text" class="block w-full pr-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" placeholder="Search by Name or Phone Number">
+								</div>
+							</div>
+							
+							<table class="w-full whitespace-no-wrap" id="dataTable">
+								<thead>
+									<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+										<th class="px-4 py-3">FullName</th>
+										<th class="px-4 py-3">Phone Number</th>
+										<th class="px-4 py-3">Boda Number</th>
+										<th class="px-4 py-3">Device</th>
+										<th class="px-4 py-3">Status</th>
+										<th class="px-4 py-3">Date</th>
+										<th class="px-6 py-3">Action</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+									<template x-for="(item, index) in items" :key="index">
+										<tr x-show="checkView(index + 1)" class="text-sm text-gray-700 dark:text-white">
+											<td class="px-4 py-3">
+												<p class="font-semibold" x-text="item.fullname"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.phone"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.boda"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.device"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-semibold" x-text="item.status"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<span x-text="item.timestamp"></span>
+											</td>
+											<td class="px-4 py-3 text-xs">
+												<a x-bind:href="`<?=DOMAIN?>dashboard/drivers/view?user=${item.userkey}`" class="px-2 py-1 uppercase font-semibold leading-tight rounded-md text-white bg-blue">View Account</a>
+											</td>
+										</tr>
+									</template>
+									<tr x-show="isEmpty()">
+										<td colspan="5" class="text-center py-3 text-gray-900 text-sm">No matching records found.</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+								<span class="flex items-center col-span-3"></span>
+								<span class="col-span-2"></span>
+								<!-- Pagination -->
+								<span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+									<nav aria-label="Table navigation">
+										<ul class="inline-flex items-center">
+											<li>
+												<button class="px-3 py-1 mx-2 border rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple" aria-label="Previous" @click="changePage(currentPage - 1)">
+													NEXT
+												</button>
+											</li>
+											
+											<li>
+												<button class="px-3 py-1 mx-2 border rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple" aria-label="Next" @click="changePage(currentPage + 1)">
+													PREV
+												</button>
+											</li>
+										</ul>
+									</nav>
+								</span>
+							</div>
+						</div>
+					</div>		
+				</div>
+			</div>
+		</div>
+    </main>
+	
+</div>
+</div>
+<?php
+$data = [];
+foreach($drivers as $entry){
+	array_push($data, array('boda' => $entry['boda_number'],
+							'userkey' => $entry['driver_id'],
+							'fullname' => $entry['firstname'].' '.$entry['lastname'],
+							'phone' => $entry['phone_number'],
+							'gender' => $entry['gender'],
+							'device' => explode("-", $entry['device_name'])[0],
+							'status' => $entry['status'],
+							'timestamp' => date('F d, Y', strtotime($entry['created_date']))));
+}
+?>
+<script>
+let dati = <?=json_encode($data);?>;
+</script>	
+<!-- partial -->
+<script src='https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js'></script>
+<script  src="<?=DOMAIN?>assets/js/datatable.js"></script>

@@ -1,0 +1,262 @@
+<?php
+	$tx = $this->view_data['tx'];
+	$sum_wallet = $this->view_data['sumwallet'];
+	$chart = $this->view_data['chart'];
+	$deposit_ratio = $this->view_data['deposit_ratio'];
+	$payment_ratio = $this->view_data['payment_ratio'];
+
+?>	
+	<main class="h-full overflow-y-auto">
+        <div class="container px-6 mx-auto grid">
+            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Payments Overview</h2>
+					
+			<div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
+				<!-- Card -->
+				<div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+					<div class="p-3 mr-4 text-teal-500 bg-teal-100 rounded-full dark:text-teal-100 dark:bg-teal-500">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+						</svg>
+					</div>
+					<div>
+					  <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+						Total Wallet Hold
+					  </p>
+					  <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+						<?=$sum_wallet?>
+					  </p>
+					</div>
+				</div>
+				
+				<!-- Card -->
+				<div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+					<div class="p-3 mr-4 text-teal-500 bg-teal-100 rounded-full dark:text-teal-100 dark:bg-teal-500">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+						</svg>
+					</div>
+					<div>
+					  <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+						Total Transaction
+					  </p>
+					  <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+						<?=count($tx)?>
+					  </p>
+					</div>
+				</div>
+            </div>
+			
+			<div class="grid gap-6 mb-8 md:grid-cols-2">
+				<div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+					<h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">Transactions Type</h4>
+					<canvas id="pie"></canvas>
+					<div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
+						<!-- Chart legend -->
+						<div class="flex items-center">
+							<span class="inline-block w-3 h-3 mr-1 bg-blue-500 rounded-full"></span>
+							<span>Ride Payment Transaction</span>
+						</div>
+						
+						<div class="flex items-center">
+							<span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
+							<span>Deposit Transaction</span>
+						</div>
+					</div>
+				</div>
+				<div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+					<h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">Yearly Transactions</h4>
+					<canvas id="bars"></canvas>
+					<div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
+						<!-- Chart legend -->
+						<div class="flex items-center">
+							<span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
+							<span>Number of Payments</span>
+						</div>
+					</div>
+				</div>
+			</div>
+				
+			<div class="flex items-center mb-4">
+				<a href="payments/review" class="px-4 bg-blue p-3 rounded-lg text-white mr-2">Review Dated Payments</a>
+			</div>			
+			
+			<!-- New Table -->
+			<div class="w-full overflow-hidden rounded-lg shadow-xs mb-8">
+				<div class="w-full overflow-x-auto">
+					<div class="max-w-screen-lg mx-auto w-full h-full flex flex-col items-center justify-center">
+						<h2 class="mt-4 font-semibold text-gray-800 dark:text-gray-300">Recent Transactions</h2>
+						<div x-data="dataTable()"
+							x-init="
+							initData()
+							$watch('searchInput', value => {
+							  search(value)
+							})" class="p-5 w-full flex flex-col dark:text-gray-400 dark:bg-gray-800 dark:border-gray-700">
+							<div class="relative text-gray-500 focus-within:text-purple-600 dark:focus-within:text-purple-400">
+								<div class="p-4">
+									<input x-model="searchInput" type="text" class="block w-full pr-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" placeholder="Search by Name or Phone Number">
+								</div>
+							</div>
+							
+							<table class="w-full whitespace-no-wrap" id="dataTable">
+								<thead>
+									<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+										<th class="px-4 py-3">Reference</th>
+										<th class="px-4 py-3">Sender</th>
+										<th class="px-4 py-3">Receiver</th>
+										<th class="px-4 py-3">Amount</th>
+										<th class="px-4 py-3">Type</th>
+										<th class="px-4 py-3">Status</th>
+										<th class="px-6 py-3">Timestamp</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+									<template x-for="(item, index) in items" :key="index">
+										<tr x-show="checkView(index + 1)" class="text-sm text-gray-700 dark:text-white">
+											<td class="px-4 py-3">
+												<a x-bind:href="`<?=DOMAIN?>dashboard/payment/view?pid=${item.reference}`">
+													<p class="font-semibold" x-text="item.reference"></p>
+												</a>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.fullname"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.receiver"></p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.amount"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.type"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<p class="font-normal" x-text="item.status"> </p>
+											</td>
+											<td class="px-4 py-3">
+												<span x-text="item.timestamp"></span>
+											</td>
+											
+										</tr>
+									</template>
+									<tr x-show="isEmpty()">
+										<td colspan="7" class="text-center py-3 text-gray-900 text-sm">No matching records found.</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+								<span class="flex items-center col-span-3"></span>
+								<span class="col-span-2"></span>
+								<!-- Pagination -->
+								<span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+									<nav aria-label="Table navigation">
+										<ul class="inline-flex items-center">
+											<li>
+												<button class="px-3 py-1 mx-2 border rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple" aria-label="Previous" @click="changePage(currentPage - 1)">
+													NEXT
+												</button>
+											</li>
+											
+											<li>
+												<button class="px-3 py-1 mx-2 border rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple" aria-label="Next" @click="changePage(currentPage + 1)">
+													PREV
+												</button>
+											</li>
+										</ul>
+									</nav>
+								</span>
+							</div>
+						</div>
+					</div>		
+				</div>
+			</div>
+			
+			
+			
+		</div>
+    </main>
+	
+</div>
+</div>
+<script>
+/**
+ * For usage, visit Chart.js docs https://www.chartjs.org/docs/latest/
+ */
+const barConfig = {
+  type: 'bar',
+  data: {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    datasets: [{
+        label: 'Transactions',
+        backgroundColor: '#7e3af2',
+        borderWidth: 1,
+        data: [<?php foreach($chart as $month) {echo $month.',';}?>],
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    legend: {
+      display: false,
+    },
+  },
+}
+
+const barsCtx = document.getElementById('bars')
+window.myBar = new Chart(barsCtx, barConfig)
+
+
+/**
+ * For usage, visit Chart.js docs https://www.chartjs.org/docs/latest/
+ */
+const pieConfig = {
+  type: 'doughnut',
+  data: {
+    datasets: [
+      {
+        data: [<?=($deposit_ratio.','.$payment_ratio)?>],
+        /**
+         * These colors come from Tailwind CSS palette
+         * https://tailwindcss.com/docs/customizing-colors/#default-color-palette
+         */
+        backgroundColor: ['#0694a2', '#1c64f2'],
+        label: 'Transactions',
+      },
+    ],
+    labels: ['Deposit Transaction', 'Ride Payment Transaction'],
+  },
+  options: {
+    responsive: true,
+    cutoutPercentage: 80,
+    /**
+     * Default legends are ugly and impossible to style.
+     * See examples in charts.html to add your own legends
+     *  */
+    legend: {
+      display: false,
+    },
+  },
+}
+
+// change this to the id of your chart element in HMTL
+const pieCtx = document.getElementById('pie')
+window.myPie = new Chart(pieCtx, pieConfig)
+
+</script>
+<?php
+$data = [];
+foreach($tx as $entry){
+	array_push($data, array('fullname' => $entry['sender_id'],
+							'reference' => $entry['txref'],
+							'receiver' => $entry['receiver_id'],
+							'amount' => number_format($entry['amount']),
+							'type' => strtoupper($entry['tx_type']),
+							'status' => strtoupper($entry['status']),
+							'timestamp' => date('F d, Y h:i:s a', strtotime($entry['timestamp']))));
+}
+?>
+<script>
+let dati = <?=json_encode($data);?>;
+</script>	
+<!-- partial -->
+<script src='https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js'></script>
+<script  src="<?=DOMAIN?>assets/js/datatable.js"></script>
